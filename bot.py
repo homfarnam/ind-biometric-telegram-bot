@@ -79,7 +79,7 @@ def callback_inline(call):
             slots_by_date = fetch_ind_dates()
             if slots_by_date:
                 send_to_channel(slots_by_date)
-            time.sleep(60)  # Wait for 5 minutes before the next API call
+            time.sleep(300)  # Wait for 5 minutes before the next API call
 
 
 bot.polling(none_stop=True)
