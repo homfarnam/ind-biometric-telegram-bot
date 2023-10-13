@@ -1,4 +1,3 @@
-import logging
 import os
 
 import telebot
@@ -82,8 +81,5 @@ def callback_inline(call):
                 send_to_channel(slots_by_date)
             time.sleep(60)  # Wait for 5 minutes before the next API call
 
-
-# logger = telebot.logger
-# telebot.logger.setLevel(logging.DEBUG)
 
 bot.polling(none_stop=True)
