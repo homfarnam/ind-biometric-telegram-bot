@@ -58,3 +58,47 @@ python bot.py
 - Click on "Fetch Slots" to start monitoring the IND API.
 
 The bot will then start monitoring the IND API and will send messages to the specified Telegram channel.
+
+---
+
+## Docker Deployment
+
+If you have Docker installed on your machine, you can use it to deploy the bot without worrying about dependencies.
+
+### Building the Docker Image
+
+First, navigate to the root directory of the project where the `Dockerfile` is located. Then, build the Docker image using the following command:
+
+```bash
+docker build -t ind-bot .
+```
+
+### Running the Docker Container
+
+After building the image, you can run it in detached mode so that it operates in the background. To do this, use the following command:
+
+```bash
+docker run -d -p 4000:80 -e TELEGRAM_TOKEN=your_token -e CHANNEL_ID=your_channel_id -e IND_API_URL=your_api_url ind-bot
+```
+
+Replace `your_token`, `your_channel_id`, and `your_api_url` with your actual Telegram bot token, channel ID, and API URL, respectively.
+
+### Monitoring Logs
+
+To check the logs of a running container, you can use the following command:
+
+```bash
+docker logs [CONTAINER_ID]
+```
+
+Replace `[CONTAINER_ID]` with the actual container ID that you received when you started the Docker container.
+
+### Stopping the Docker Container
+
+If you need to stop the Docker container, you can do so with the following command:
+
+```bash
+docker stop [CONTAINER_ID]
+```
+
+Replace `[CONTAINER_ID]` with the actual container ID.
