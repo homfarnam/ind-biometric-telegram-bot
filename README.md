@@ -1,4 +1,4 @@
-# IND Slot Monitor Bot
+# IND Biometric Slot Monitor Bot
 
 ## Description
 
