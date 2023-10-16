@@ -82,4 +82,4 @@ def callback_inline(call):
             time.sleep(300)  # Wait for 5 minutes before the next API call
 
 
-bot.polling(none_stop=True)
+bot.polling(non_stop=True)
