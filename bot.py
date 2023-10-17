@@ -1,24 +1,30 @@
 import os
-
 import telebot
 import requests
 import json
 import time
-from telebot import types
 from dotenv import load_dotenv
 import random
 from time import sleep
+import logging
 
 load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHANNEL_ID = os.getenv('CHANNEL_ID')
 IND_API_URL = os.getenv('IND_API_URL')
+ADMIN_ID = os.getenv('ADMIN_ID')
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 MAX_RETRIES = 5
 SLEEP_TIME = 2  # Time to sleep between retries, in seconds
+
+# Public commands
+bot.set_my_commands(commands=[
+    telebot.types.BotCommand("start", "Start the bot"),
+    telebot.types.BotCommand("settings", "Change settings"),
+], scope=telebot.types.BotCommandScopeDefault())
 
 
 def fetch_ind_dates():
@@ -62,7 +68,7 @@ def fetch_ind_dates():
     sleep(sleep_time)
 
 
-def send_to_channel(slots_by_date):
+def send_to_chat(slots_by_date, chat_id):
     for date, slots in slots_by_date.items():
         slot_times = ["{0} - {1}".format(slot['startTime'], slot['endTime']) for slot in slots]
 
@@ -73,12 +79,13 @@ def send_to_channel(slots_by_date):
         ).format(date, '\n'.join(slot_times))
 
         bot.send_message(CHANNEL_ID, message)
+        bot.send_message(chat_id, message)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    keyboard = types.InlineKeyboardMarkup()
-    button = types.InlineKeyboardButton(text="Fetch Slots", callback_data="start_monitoring")
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    button = telebot.types.InlineKeyboardButton(text="Fetch Slots", callback_data="start_monitoring")
     keyboard.add(button)
     bot.send_message(message.chat.id, "Please choose:", reply_markup=keyboard)
 
@@ -90,8 +97,11 @@ def callback_inline(call):
         while True:
             slots_by_date = fetch_ind_dates()
             if slots_by_date:
-                send_to_channel(slots_by_date)
+                send_to_chat(slots_by_date, call.message.chat.id)
             time.sleep(300)  # Wait for 5 minutes before the next API call
 
+
+logger = telebot.logger
+telebot.logger.setLevel(logging.DEBUG)
 
 bot.polling(non_stop=True)
