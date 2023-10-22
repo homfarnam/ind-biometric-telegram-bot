@@ -38,7 +38,6 @@ bot.set_my_commands(commands=[
 def settings(message):
     keyboard = telebot.types.InlineKeyboardMarkup()
     for city in city_api_map.keys():
-        # Convert 'the_hague' to 'The Hague'
         city_label = city.replace('_', ' ').capitalize()
         button = telebot.types.InlineKeyboardButton(
             text=city_label, callback_data=f"set_city_{city}")
