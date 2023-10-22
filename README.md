@@ -78,7 +78,7 @@ docker build -t ind-bot .
 After building the image, you can run it in detached mode so that it operates in the background. To do this, use the following command:
 
 ```bash
-docker run -d -p 4000:80 -e TELEGRAM_TOKEN=your_token -e CHANNEL_ID=your_channel_id -e IND_API_URL=your_api_url ind-bot
+docker run -d -p 4000:80 -e TELEGRAM_TOKEN=your_token ind-bot
 ```
 
 Replace `your_token`, `your_channel_id`, and `your_api_url` with your actual Telegram bot token, channel ID, and API URL, respectively.
