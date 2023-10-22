@@ -15,10 +15,10 @@ CHANNEL_ID = os.getenv('CHANNEL_ID')
 IND_API_URL = os.getenv('IND_API_URL')
 ADMIN_ID = os.getenv('ADMIN_ID')
 
-# Initialize bot and logger
+# Initialize bot
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
-# In-memory storage for user settings. For production, consider using a database.
+# In-memory storage for user settings. TODO: Later, consider using a database.
 user_settings = {}
 user_stop_flags = {}
 
@@ -50,7 +50,7 @@ def settings(message):
 def helpcommand(message):
     bot.send_message(message.chat.id, "This bot fetches IND appointment slots for you. "
                                       "You can set a city and start fetching data. \n"
-                                      "You will be notified when slots are available each 1 minute. "
+                                      "You will be notified when slots are available each 5 minute. "
                                       "To start, use the /start command.")
 
 
@@ -105,7 +105,7 @@ def start_fetching(call):
                 elif slots_by_date is None or len(slots_by_date) == 0:
                     bot.send_message(chat_id, "No available dates.")
                     break
-                time.sleep(60)
+                time.sleep(300)
 
     else:
         bot.send_message(chat_id, "Please set a city using the /start command.")
