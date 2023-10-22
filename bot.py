@@ -1,12 +1,7 @@
 import os
-import random
-
 import telebot
-import requests
-import json
 import time
 from dotenv import load_dotenv
-from time import sleep
 import logging
 
 from settings import city_api_map
@@ -22,14 +17,11 @@ ADMIN_ID = os.getenv('ADMIN_ID')
 
 # Initialize bot and logger
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-# logger = telebot.logger
-# telebot.logger.setLevel(logging.DEBUG)
 
 # In-memory storage for user settings. For production, consider using a database.
 user_settings = {}
 user_stop_flags = {}
 
-# delete commands for adminid
 bot.delete_my_commands(scope=telebot.types.BotCommandScopeAllChatAdministrators())
 bot.delete_my_commands(scope=telebot.types.BotCommandScopeAllPrivateChats())
 bot.delete_my_commands(scope=telebot.types.BotCommandScopeChat(ADMIN_ID))
