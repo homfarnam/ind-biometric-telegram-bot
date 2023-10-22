@@ -16,8 +16,7 @@ EXPOSE 80
 # Define an environment variable
 # Use -e flag with docker run to override
 ENV TELEGRAM_TOKEN undefined
-ENV CHANNEL_ID undefined
-ENV IND_API_URL undefined
+ENV ADMIN_ID undefined
 
 # Run your bot when the container launches
 CMD ["python", "bot.py"]
