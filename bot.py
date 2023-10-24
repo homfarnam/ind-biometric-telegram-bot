@@ -3,6 +3,7 @@ import telebot
 import time
 from dotenv import load_dotenv
 import logging
+from threading import Event
 
 from settings import city_api_map
 from utils import fetch_ind_dates, send_to_chat
@@ -21,6 +22,7 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 # In-memory storage for user settings. TODO: Later, consider using a database.
 user_settings = {}
 user_stop_flags = {}
+user_stop_events = {}
 
 bot.delete_my_commands(scope=telebot.types.BotCommandScopeAllChatAdministrators())
 bot.delete_my_commands(scope=telebot.types.BotCommandScopeAllPrivateChats())
@@ -68,54 +70,45 @@ def set_city(call):
                      "Do you want to start fetching data?", reply_markup=keyboard)
 
 
+def fetch_data_for_user(user_id, chat_id):
+    if user_id in user_settings:
+        city = user_settings[user_id]
+        api_url = city_api_map.get(city)
+        if api_url:
+            slots_by_date = fetch_ind_dates(api_url)
+            if slots_by_date:
+                send_to_chat(bot, slots_by_date, chat_id)
+                keyboard = telebot.types.InlineKeyboardMarkup()
+                button = telebot.types.InlineKeyboardButton(
+                    text="Stop fetching data", callback_data="stop_fetching")
+                keyboard.add(button)
+                bot.send_message(chat_id, "Click below to stop fetching data:", reply_markup=keyboard)
+            elif slots_by_date is None or len(slots_by_date) == 0:
+                bot.send_message(chat_id, "No available dates.")
+
+
 @bot.callback_query_handler(func=lambda call: call.data == "start_fetching")
 def start_fetching(call):
     user_id = call.from_user.id
     chat_id = call.message.chat.id
-    bot.send_message(chat_id, "Starting to fetch data...")
+    print('Starting to fetch data...')
 
-    # Initialize or reset the stop flag for this user
-    user_stop_flags[user_id] = False
+    user_stop_events[user_id] = Event()  # Initialize stop event for this user
 
-    if user_id in user_settings:
-        city = user_settings[user_id]
-        api_url = city_api_map.get(city)
-
-        if api_url:
-
-            while True:
-                # Check if the user has requested to stop
-                if user_stop_flags.get(user_id, True):
-                    print(f"Stopped fetching data for user {user_id}")
-                    break
-
-                slots_by_date = fetch_ind_dates(api_url)
-
-                if slots_by_date:
-                    send_to_chat(bot, slots_by_date, chat_id)
-
-                    # After fetching and sending the data, send the stop button
-                    keyboard = telebot.types.InlineKeyboardMarkup()
-                    button = telebot.types.InlineKeyboardButton(
-                        text="Stop fetching data", callback_data="stop_fetching")
-                    keyboard.add(button)
-                    bot.send_message(chat_id, "Click below to stop fetching data:", reply_markup=keyboard)
-
-                elif slots_by_date is None or len(slots_by_date) == 0:
-                    bot.send_message(chat_id, "No available dates.")
-                    break
-                time.sleep(300)
-
-    else:
-        bot.send_message(chat_id, "Please set a city using the /start command.")
+    while not user_stop_events[user_id].is_set():  # Check if the stop event is set
+        try:
+            fetch_data_for_user(user_id, chat_id)
+            time.sleep(300)  # 5 minute delay
+        except Exception as e:
+            print(f"Error while fetching data for user {user_id}: {e}")
+            time.sleep(60)  # Wait for a minute before retrying
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "stop_fetching")
 def stop_fetching(call):
     user_id = call.from_user.id
-    user_stop_flags[user_id] = True  # Set the stop flag for this user
-    bot.send_message(call.message.chat.id,
-                     "Stopping data fetch. You can restart anytime by /start.")
+    user_stop_events[user_id].set()  # Set the stop event for this user
+    bot.send_message(call.message.chat.id, "Stopping data fetch. You can restart anytime by /start.")
 
 
 logger = telebot.logger
