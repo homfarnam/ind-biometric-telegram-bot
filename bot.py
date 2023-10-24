@@ -29,7 +29,6 @@ bot.delete_my_commands(scope=telebot.types.BotCommandScopeDefault())
 
 bot.set_my_commands(commands=[
     telebot.types.BotCommand("start", "Start the bot"),
-    telebot.types.BotCommand("settings", "Change settings"),
     telebot.types.BotCommand("help", "About the bot"),
 ], scope=telebot.types.BotCommandScopeDefault())
 
