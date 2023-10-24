@@ -2,8 +2,14 @@ import os
 import telebot
 import time
 from dotenv import load_dotenv
+<<<<<<< HEAD
+import random
+from time import sleep
+import logging
+=======
 import logging
 from threading import Event
+>>>>>>> main
 
 from settings import city_api_map
 from utils import fetch_ind_dates, send_to_chat
