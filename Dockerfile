@@ -24,7 +24,6 @@ EXPOSE 80
 # Define an environment variable
 # Use -e flag with docker run to override
 ENV TELEGRAM_TOKEN undefined
-ENV ADMIN_ID undefined
 
 # Command to run PM2 using the configuration file.
 CMD ["pm2-runtime", "start", "pm2.json"]
