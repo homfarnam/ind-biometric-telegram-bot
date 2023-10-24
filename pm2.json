@@ -1,0 +1,8 @@
+{
+  "apps": [
+    {
+      "name": "IND bot",
+      "script": "python bot.py"
+    }
+  ]
+}
