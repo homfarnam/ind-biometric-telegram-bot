@@ -13,8 +13,6 @@ load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHANNEL_ID = os.getenv('CHANNEL_ID')
-IND_API_URL = os.getenv('IND_API_URL')
-ADMIN_ID = os.getenv('ADMIN_ID')
 
 # Initialize bot
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
@@ -24,9 +22,9 @@ user_settings = {}
 user_stop_flags = {}
 user_stop_events = {}
 
-bot.delete_my_commands(scope=telebot.types.BotCommandScopeAllChatAdministrators())
+bot.delete_my_commands(
+    scope=telebot.types.BotCommandScopeAllChatAdministrators())
 bot.delete_my_commands(scope=telebot.types.BotCommandScopeAllPrivateChats())
-bot.delete_my_commands(scope=telebot.types.BotCommandScopeChat(ADMIN_ID))
 bot.delete_my_commands(scope=telebot.types.BotCommandScopeDefault())
 
 bot.set_my_commands(commands=[
@@ -82,7 +80,8 @@ def fetch_data_for_user(user_id, chat_id):
                 button = telebot.types.InlineKeyboardButton(
                     text="Stop fetching data", callback_data="stop_fetching")
                 keyboard.add(button)
-                bot.send_message(chat_id, "Click below to stop fetching data:", reply_markup=keyboard)
+                bot.send_message(
+                    chat_id, "Click below to stop fetching data:", reply_markup=keyboard)
             elif slots_by_date is None or len(slots_by_date) == 0:
                 bot.send_message(chat_id, "No available dates.")
 
@@ -95,7 +94,8 @@ def start_fetching(call):
 
     user_stop_events[user_id] = Event()  # Initialize stop event for this user
 
-    while not user_stop_events[user_id].is_set():  # Check if the stop event is set
+    # Check if the stop event is set
+    while not user_stop_events[user_id].is_set():
         try:
             fetch_data_for_user(user_id, chat_id)
             time.sleep(300)  # 5 minute delay
@@ -108,7 +108,8 @@ def start_fetching(call):
 def stop_fetching(call):
     user_id = call.from_user.id
     user_stop_events[user_id].set()  # Set the stop event for this user
-    bot.send_message(call.message.chat.id, "Stopping data fetch. You can restart anytime by /start.")
+    bot.send_message(call.message.chat.id,
+                     "Stopping data fetch. You can restart anytime by /start.")
 
 
 logger = telebot.logger
