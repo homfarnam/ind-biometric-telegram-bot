@@ -4,7 +4,7 @@ from time import sleep
 import random
 import telebot
 
-from settings import city_api_map, MAX_RETRIES, SLEEP_TIME
+from settings import MAX_RETRIES, SLEEP_TIME
 
 
 def fetch_ind_dates(api_url: str):
