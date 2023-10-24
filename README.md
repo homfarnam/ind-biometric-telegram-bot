@@ -87,8 +87,7 @@ following command:
 docker run -d -p 4000:80 -e TELEGRAM_TOKEN=your_token ind-bot
 ```
 
-Replace `your_token`, `your_channel_id`, and `your_api_url` with your actual Telegram bot token, channel ID, and API
-URL, respectively.
+Replace `your_token` with your actual Telegram bot token, respectively.
 
 ### Monitoring Logs
 
