@@ -20,7 +20,6 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 # In-memory storage for user settings. TODO: Later, consider using a database.
 user_settings = {}
 user_stop_flags = {}
-user_stop_events = {}
 
 bot.delete_my_commands(
     scope=telebot.types.BotCommandScopeAllChatAdministrators())
@@ -75,12 +74,7 @@ def fetch_data_for_user(user_id, chat_id):
             slots_by_date = fetch_ind_dates(api_url)
             if slots_by_date:
                 send_to_chat(bot, slots_by_date, chat_id)
-                keyboard = telebot.types.InlineKeyboardMarkup()
-                button = telebot.types.InlineKeyboardButton(
-                    text="Stop fetching data", callback_data="stop_fetching")
-                keyboard.add(button)
-                bot.send_message(
-                    chat_id, "Click below to stop fetching data:", reply_markup=keyboard)
+
             elif slots_by_date is None or len(slots_by_date) == 0:
                 bot.send_message(chat_id, "No available dates.")
 
@@ -91,24 +85,12 @@ def start_fetching(call):
     chat_id = call.message.chat.id
     print('Starting to fetch data...')
 
-    user_stop_events[user_id] = Event()  # Initialize stop event for this user
-
-    # Check if the stop event is set
-    while not user_stop_events[user_id].is_set():
-        try:
-            fetch_data_for_user(user_id, chat_id)
-            time.sleep(300)  # 5 minute delay
-        except Exception as e:
-            print(f"Error while fetching data for user {user_id}: {e}")
-            time.sleep(60)  # Wait for a minute before retrying
-
-
-@bot.callback_query_handler(func=lambda call: call.data == "stop_fetching")
-def stop_fetching(call):
-    user_id = call.from_user.id
-    user_stop_events[user_id].set()  # Set the stop event for this user
-    bot.send_message(call.message.chat.id,
-                     "Stopping data fetch. You can restart anytime by /start.")
+    try:
+        fetch_data_for_user(user_id, chat_id)
+        time.sleep(300)  # 5 minute delay
+    except Exception as e:
+        print(f"Error while fetching data for user {user_id}: {e}")
+        time.sleep(60)  # Wait for a minute before retrying
 
 
 logger = telebot.logger
