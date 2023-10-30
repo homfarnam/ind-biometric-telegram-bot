@@ -11,7 +11,6 @@ first 5 days and sends this information to your chat with the bot.
 - Fetches available biometric appointment slots from the IND API.
 - Filters and sorts slots by date.
 - Sends the earliest available slots of the first 5 days to the chat.
-- Continuous monitoring of the IND API at 5-minute intervals.
 
 ## Environment Variables
 
