@@ -51,11 +51,11 @@ def fetch_ind_dates(api_url: str):
     sleep(sleep_time)
 
 
-def send_to_chat(bot: telebot.TeleBot, slots_by_date, chat_id, city_label):
+def send_to_chat(bot: telebot.TeleBot, slots_by_date, chat_id, city_label, main_menu_id):
     for date, slots in slots_by_date.items():
         slot_times = [
             "{0} - {1}".format(slot['startTime'], slot['endTime']) for slot in slots]
-        
+
         city_name = ' '.join(map(lambda x: x.capitalize(), city_label.split(' ')))
         message = (
             "🏢 City: {0}\n"
@@ -64,4 +64,4 @@ def send_to_chat(bot: telebot.TeleBot, slots_by_date, chat_id, city_label):
             "\n\nGet your appointment: https://oap.ind.nl/oap/en/#/BIO"
         ).format(city_name, date, '\n'.join(slot_times))
 
-        bot.send_message(chat_id, message)
+        bot.send_message(chat_id, message, reply_to_message_id=main_menu_id)
