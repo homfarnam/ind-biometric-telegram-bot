@@ -31,21 +31,27 @@ bot.set_my_commands(commands=[
 
 @bot.message_handler(commands=['start'])
 def settings(message):
+    global main_menu_id
+
     keyboard = telebot.types.InlineKeyboardMarkup()
     for city in city_api_map.keys():
         city_label = city.replace('_', ' ').capitalize()
         button = telebot.types.InlineKeyboardButton(
             text=city_label, callback_data=f"set_city_{city}")
         keyboard.add(button)
-    bot.send_message(message.chat.id, "Choose a city:", reply_markup=keyboard)
+
+    #     put send message in to a variable
+    choose_city_message = bot.send_message(message.chat.id, "Choose a city:",
+                                           reply_markup=keyboard)
+    main_menu_id = choose_city_message.message_id
 
 
 @bot.message_handler(commands=['help'])
 def helpcommand(message):
     bot.send_message(message.chat.id, "This bot fetches IND appointment slots for you. "
                                       "You can set a city and start fetching data. \n"
-                                      "You will be notified when slots are available each 5 minute. "
-                                      "To start, use the /start command.")
+                                      "You will be notified when slots are available each time you start fetching data."
+                                      "\nTo start, use the /start command.")
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('set_city_'))
@@ -71,7 +77,7 @@ def fetch_data_for_user(user_id, chat_id):
         if api_url:
             slots_by_date = fetch_ind_dates(api_url)
             if slots_by_date:
-                send_to_chat(bot, slots_by_date, chat_id, city_label)
+                send_to_chat(bot, slots_by_date, chat_id, city_label, main_menu_id)
 
             elif slots_by_date is None or len(slots_by_date) == 0:
                 bot.send_message(chat_id, "No available dates.")
