@@ -1,10 +1,7 @@
 import os
 import telebot
-import time
 from dotenv import load_dotenv
 import logging
-from threading import Event
-
 from settings import city_api_map
 from utils import fetch_ind_dates, send_to_chat
 
@@ -69,11 +66,12 @@ def set_city(call):
 def fetch_data_for_user(user_id, chat_id):
     if user_id in user_settings:
         city = user_settings[user_id]
+        city_label = city.replace('_', ' ').capitalize()
         api_url = city_api_map.get(city)
         if api_url:
             slots_by_date = fetch_ind_dates(api_url)
             if slots_by_date:
-                send_to_chat(bot, slots_by_date, chat_id)
+                send_to_chat(bot, slots_by_date, chat_id, city_label)
 
             elif slots_by_date is None or len(slots_by_date) == 0:
                 bot.send_message(chat_id, "No available dates.")
@@ -87,13 +85,13 @@ def start_fetching(call):
 
     try:
         fetch_data_for_user(user_id, chat_id)
-        time.sleep(300)  # 5 minute delay
     except Exception as e:
         print(f"Error while fetching data for user {user_id}: {e}")
-        time.sleep(60)  # Wait for a minute before retrying
 
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.DEBUG)
 
-bot.polling(non_stop=True)
+bot.infinity_polling(timeout=20, long_polling_timeout=5,
+                     logger_level=logging.DEBUG
+                     )
