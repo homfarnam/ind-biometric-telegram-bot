@@ -48,7 +48,7 @@ def helpcommand(message):
     bot.send_message(message.chat.id, "This bot fetches IND appointment slots for you. "
                                       "You can set a city and start fetching data. \n"
                                       "You will be notified when slots are available each time you start fetching data."
-                                      "\nTo start, use the /start command.")
+                                      "\nTo start, press any cities you want to search for from the list below.")
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('set_city_'))
